@@ -43,3 +43,13 @@ func DeleteUser(user *User, id string) (err error) {
 	Config.DB.Where("id = ?", id).Delete(user)
 	return nil
 }
+
+//type NewInterface interface {
+//	getName()
+//}
+//
+//type user struct{}
+//
+//func (s *user) name() string {
+//	return "abc"
+//}

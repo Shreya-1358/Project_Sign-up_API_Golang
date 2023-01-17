@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"google.golang.org/grpc"
 	"gorm.io/driver/mysql"
+	"grpc/config"
+	"grpc/interceptors"
 	pb "grpc/proto"
 	"log"
 	"net"
@@ -62,6 +64,8 @@ func init() {
 		log.Fatal("Error connecting to the database...", err)
 	}
 	fmt.Println("Database connected...")
+
+	config.ApiLogger()
 }
 
 func (u *User) TableName() string {
@@ -100,7 +104,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("Failed to listen: %v", err)
 	}
-	s := grpc.NewServer()
+	s := grpc.NewServer(grpc.UnaryInterceptor(interceptors.ServerInterceptor))
 	pb.RegisterLoginServer(s, NewServer())
 
 	log.Printf("Server listening at %v", listen.Addr())

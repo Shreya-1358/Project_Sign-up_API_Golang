@@ -1,8 +1,9 @@
 package main
 
 import (
-	"fmt"
-	"github.com/jinzhu/gorm"
+	"gorm.io/driver/mysql"
+	"gorm.io/gorm"
+	"log"
 	Config "repos/project/config"
 	"repos/project/model"
 	"repos/project/routes"
@@ -10,17 +11,18 @@ import (
 
 var err error
 
-func main() {
-	fmt.Println("start")
-	fmt.Println("db:", Config.DbURL(Config.BuildDBConfig()))
-	Config.DB, err = gorm.Open("mysql", Config.DbURL(Config.BuildDBConfig()))
-	fmt.Println("db end")
+func init() {
+	Config.DB, err = gorm.Open(mysql.Open(Config.DbURL()), &gorm.Config{})
 	if err != nil {
-		fmt.Println("Status:", err)
+		log.Fatal("Status:", err)
 	}
-	defer Config.DB.Close()
+
 	Config.DB.AutoMigrate(&model.User{})
+
+}
+
+func main() {
+
 	r := routes.SetupRouter()
-	//running
 	r.Run()
 }

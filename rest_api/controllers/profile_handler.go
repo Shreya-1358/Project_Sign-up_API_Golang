@@ -1,73 +1,69 @@
 package controllers
 
 import (
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"repos/project/model"
+	"repos/project/service"
 )
 
-// GetUsers ... Get all users
-func GetUsers(c *gin.Context) {
-	var user []model.User
-	err := model.GetAllUsers(&user)
+type UserController struct {
+	userService service.UserService
+}
+
+func NewUserController(us service.UserService) *UserController {
+	return &UserController{userService: us}
+}
+
+func (uc *UserController) GetUser(c *gin.Context) {
+
+	user, err := uc.userService.GetAllUsers()
 	if err != nil {
-		c.AbortWithStatus(http.StatusNotFound)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Records not Found"})
+
+	} else {
+		c.JSON(http.StatusOK, user)
+	}
+}
+func (uc *UserController) GetUserById(c *gin.Context) {
+	id := c.Param("id")
+	user, err := uc.userService.GetUserById(id)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Employee Not Exist"})
+
+	} else {
+		c.JSON(http.StatusOK, user)
+	}
+}
+func (uc *UserController) CreateUser(c *gin.Context) {
+	var user model.User
+
+	if err := c.BindJSON(&user); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	err := uc.userService.CreateUser(&user)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error while creating Employee"})
 	} else {
 		c.JSON(http.StatusOK, user)
 	}
 }
 
-// CreateUser ... Create User
-func CreateUser(c *gin.Context) {
+func (uc *UserController) UpdateUser(c *gin.Context) {
+
 	var user model.User
-	c.BindJSON(&user)
-	err := model.CreateUser(&user)
+	id := c.Param("id")
+	if err := c.BindJSON(&user); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	err := uc.userService.UpdateUser(&user, id)
 	if err != nil {
-		fmt.Println(err.Error())
-		c.AbortWithStatus(http.StatusNotFound)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Employee Not Exist"})
 	} else {
 		c.JSON(http.StatusOK, user)
 	}
-}
 
-// GetUserByID ... Get the user by id
-func GetUserByID(c *gin.Context) {
-	id := c.Params.ByName("id")
-	var user model.User
-	err := model.GetUserByID(&user, id)
-	if err != nil {
-		c.AbortWithStatus(http.StatusNotFound)
-	} else {
-		c.JSON(http.StatusOK, user)
-	}
-}
-
-// UpdateUser ... Update the user information
-func UpdateUser(c *gin.Context) {
-	var user model.User
-	id := c.Params.ByName("id")
-	err := model.GetUserByID(&user, id)
-	if err != nil {
-		c.JSON(http.StatusNotFound, user)
-	}
-	c.BindJSON(&user)
-	err = model.UpdateUser(&user, id)
-	if err != nil {
-		c.AbortWithStatus(http.StatusNotFound)
-	} else {
-		c.JSON(http.StatusOK, user)
-	}
-}
-
-// DeleteUser ... Delete the user
-func DeleteUser(c *gin.Context) {
-	var user model.User
-	id := c.Params.ByName("id")
-	err := model.DeleteUser(&user, id)
-	if err != nil {
-		c.AbortWithStatus(http.StatusNotFound)
-	} else {
-		c.JSON(http.StatusOK, gin.H{"id" + id: "is deleted"})
-	}
 }

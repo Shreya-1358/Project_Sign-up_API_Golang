@@ -1,8 +1,23 @@
 Aim :- Creating an Rest API where an user can sign-up the required fields - id, name, mobile number, address, username, password and creating a gRPC API for the user login that accepts username and password, returns login failed or success.
 
-Task:- Firstly storing the data in MySql database. For Rest API I have database configuration, model, routes, controller and main file. For gRPC API I have proto, client and server file.
+Steps to follow:-
 
-Process:- 
+Prerequisites:-
+Install go1.19:
+To avoid any surprises in the project install go 1.19, please use the commands below to install go 1.19 in your machine:
+go install golang.org/dl/go1.19@latest
+go1.19 download
+
+Clone the project and install the dependencies:
+Clone the project from Github and then run the following command to install dependencies.
+go get
+
+Install Mockgen:
+mockgen is a mock generator tool which we are going to use to generate our mocks. To install run the following command:
+go install github.com/golang/mock/mockgen@v1.6.0
+
+Project Outline :-
+Firstly storing the data in MySql database. For Rest API I have database configuration, model, routes, controller and main file. For gRPC API I have proto, client and server file.
 
 Rest API: 
 config : I have added the database configuration in config.go file under config directory.
